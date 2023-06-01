@@ -18,7 +18,6 @@ const jwt = async (payload, done) => {
       id: "1",
       role: "admin",
     };
-    logger.info({payload, user})
     return done(null, user);
   } catch (error) {
     logger.error({error})

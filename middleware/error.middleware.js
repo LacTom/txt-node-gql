@@ -21,7 +21,7 @@ exports.converter = (err, req, res, next) => {
   if (err instanceof expressValidation.ValidationError) {
     convertedError = new APIError({
       message: 'Validation Error',
-      errors: err.errors,
+      errors: err.errors || err.details,
       status: err.status,
       stack: err.stack,
     });
