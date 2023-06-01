@@ -3,6 +3,7 @@ const promises = require('fs').promises;
 const httpStatus = require("http-status");
 const path = require("path");
 const filePath = path.join(__dirname, "../mocks");
+const logger = require("../utils/logger");
 
 const getDBData = () => {
   let rawdata = fs.readFileSync(`${filePath}/peopleMock.json`);
@@ -25,7 +26,7 @@ const writeAsyncDBData = async (data) => {
 };
 
 exports.load = (req, res, next, id) => {
-  console.log(`retrieving id: ${id}`);
+  logger.debug(`retrieving id: ${id}`);
   return next();
 };
 
@@ -38,6 +39,7 @@ exports.get = (req, res, next) => {
       res.status(httpStatus.OK);
       res.json(person);
     } else {
+      logger.error(`id: ${id} not found!`)
       next(new Error(`id: ${id} not found!`));
       //res.status(httpStatus.NOT_FOUND);
       //res.json("Id not found");
@@ -77,7 +79,7 @@ exports.update = (req, res, next) => {
       res.status(httpStatus.OK);
       res.json(toUpdate);
     } else {
-      console.warn(`id: ${id} was not found, thus it couldn't be updated`);
+      logger.warn(`id: ${id} was not found, thus it couldn't be updated`);
       res.status(httpStatus.NOT_FOUND);
       res.json("Id not found");
     }
@@ -105,7 +107,7 @@ exports.delete = (req, res, next) => {
       writeDBData(oldData);
       res.status(httpStatus.NO_CONTENT).end();
     } else {
-      console.warn(`id: ${id} was not found, thus it couldn't be deleted`);
+      logger.warn(`id: ${id} was not found, thus it couldn't be deleted`);
       res.status(httpStatus.NOT_FOUND);
       res.json("id not found")
     }
