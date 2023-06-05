@@ -111,8 +111,45 @@ const createData = async (mydb, data) => {
   });
   return await created;
 };
-const updateData = async (mydb, id, data) => {};
-const deleteData = async (mydb, id) => {};
+
+const updateData = async (mydb, id, data) => {
+  const created = new Promise((resolve, reject) => {
+    let query = "UPDATE people set";
+    Object.entries(data).forEach((entry, idx, arr) => {
+      const key = entry[0];
+      const value = entry[1];
+      query = query.concat(`${key} = ${typeof value === "string" ? `'${value}'` : value}`);
+      if (idx !== arr.length - 1) {
+        query = query.concat(",");
+      }
+    });
+    query = query.concat("where id = ?");
+    logger.info(query);
+    mydb.run(query, id, async function(err) {
+      if (err) {
+        logger.error(err);
+        reject();
+      }
+      const updated = await get(db, id);
+      resolve(updated);
+    });
+  });
+  return await created;
+};
+
+const deleteData = async (mydb, id) => {
+  const created = new Promise((resolve, reject) => {
+    const query = "delete from people where id = ?";
+    mydb.run(query, id, async function(err) {
+      if (err) {
+        logger.error(err);
+        reject();
+      }
+      resolve();
+    });
+  });
+  return await created;
+};
 
 const DBOperations = {
   getAll,
