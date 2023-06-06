@@ -1,62 +1,82 @@
 const logger = require("../utils/logger");
-const sqlite3 = require("sqlite3").verbose();
+const { Sequelize, DataTypes } = require('sequelize');
+// const sqlite3 = require("sqlite3").verbose();
 
-let db;
+// const db = new sqlite3.Database("myDb.db");
 
-const getDB = () => {
-  try {
-    if (!db) {
-      db = new sqlite3.Database(":memory:");
-      initDBData(db);
-    }
-    return db;
-  } catch (e) {
-    logger.error(e);
+const sequelize = new Sequelize({
+  dialect: 'sqlite',
+  storage: "./myDb.db"
+});
+
+const Person = sequelize.define('people', {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  }, 
+  firstName: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  lastName: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  knowsNodeJs: {
+    type: DataTypes.BOOLEAN
+  },
+  BU: {
+    type: DataTypes.ENUM,
+    values: ["DIMI", "DINE"]
+  },
+  city: {
+    type: DataTypes.STRING
   }
-};
+}, {
+  createdAt: false,
+  updatedAt: false
+});
 
-const closeDB = async (myDb) => {
+const initDBData = () => {
   try {
-    if (myDb) {
-      const { error } = await myDb.close();
-      if (error) {
-        logger.error(error);
-      }
-    }
-  } catch (e) {
-    logger.error(e);
-  }
-};
-
-const initDBData = (myDb) => {
-  try {
-    if (myDb) {
+    (async () => {
+    await sequelize.query("CREATE TABLE IF NOT EXISTS people (id INTEGER PRIMARY KEY, firstName TEXT, lastName TEXT, knowsNodeJs INTEGER, BU TEXT, city TEXT)");
+    await sequelize.query("delete from people");
+    await sequelize.query("INSERT INTO people (id, firstName, lastName, knowsNodeJs, BU, city) VALUES (1, 'Judy','Garland',TRUE,'DIMI','Somewhere over the rainbow')");
+    await sequelize.query("INSERT INTO people (id, firstName, lastName, knowsNodeJs, BU, city) VALUES (2, 'Fred','Astair',FALSE,'DINE','Padua')");
+    await sequelize.query("INSERT INTO people (id, firstName, lastName, knowsNodeJs, BU, city) VALUES (3,'Marlon','Brando',FALSE,'LC','Turin')");
+    await sequelize.query("INSERT INTO people (id, firstName, lastName, knowsNodeJs, BU, city) VALUES (4,'Sofia','Loren',FALSE,'Self-employed','Milan')");
+  })();
+   /* if (db) {
       db.serialize(() => {
-        myDb.run(
+        db.run(
           "CREATE TABLE IF NOT EXISTS people (id INTEGER PRIMARY KEY, firstName TEXT, lastName TEXT, knowsNodeJs INTEGER, BU TEXT, city TEXT)"
         );
-        myDb.run(
+        db.run("delete from people");
+        db.run(
           "INSERT INTO people (id, firstName, lastName, knowsNodeJs, BU, city) VALUES (1, 'Judy','Garland',TRUE,'DIMI','Somewhere over the rainbow')"
         );
-        myDb.run(
+        db.run(
           "INSERT INTO people (id, firstName, lastName, knowsNodeJs, BU, city) VALUES (2, 'Fred','Astair',FALSE,'DINE','Padua')"
         );
-        myDb.run(
+        db.run(
           "INSERT INTO people (id, firstName, lastName, knowsNodeJs, BU, city) VALUES (3,'Marlon','Brando',FALSE,'LC','Turin')"
         );
-        myDb.run(
+        db.run(
           "INSERT INTO people (id, firstName, lastName, knowsNodeJs, BU, city) VALUES (4,'Sofia','Loren',FALSE,'Self-employed','Milan')"
         );
       });
-    }
+    }*/
   } catch (e) {
     logger.error(e);
   }
 };
 
-const getAll = async (myDb) => {
-  const getData = new Promise((resolve, reject) => {
-    myDb.all("SELECT * FROM people", function (err, rows) {
+const getAll = async () => {
+  return await Person.findAll();
+  /* const getData = new Promise((resolve, reject) => {
+    db.all("SELECT * FROM people", function (err, rows) {
       if (err) {
         reject();
         logger.error(err);
@@ -65,12 +85,13 @@ const getAll = async (myDb) => {
     });
   });
   const results = await getData;
-  return results;
+  return results; */
 };
 
-const get = async (myDb, id) => {
-  const getData = new Promise((resolve, reject) => {
-    myDb.get("SELECT * FROM people where id=?", id, (err, row) => {
+const get = async (id) => {
+  return await Person.findByPk(id);
+  /*const getData = new Promise((resolve, reject) => {
+    db.get("SELECT * FROM people where id=?", id, (err, row) => {
       if (err) {
         reject();
         logger.error(err);
@@ -79,11 +100,13 @@ const get = async (myDb, id) => {
     });
   });
   const results = await getData;
-  return results;
+  return results;*/
 };
 
-const createData = async (mydb, data) => {
-  const created = new Promise((resolve, reject) => {
+const createData = async (data) => {
+  return await Person.create(data);
+
+  /* const created = new Promise((resolve, reject) => {
     let query = "INSERT INTO people (";
     Object.keys(data).forEach((key, idx, arr) => {
       query = query.concat(key);
@@ -100,7 +123,7 @@ const createData = async (mydb, data) => {
     });
     query = query.concat(")");
     logger.info(query);
-    mydb.run(query, async function(err) {
+    db.run(query, async function(err) {
       if (err) {
         logger.error(err);
         reject();
@@ -110,10 +133,22 @@ const createData = async (mydb, data) => {
     });
   });
   return await created;
+  */
 };
 
-const updateData = async (mydb, id, data) => {
-  const created = new Promise((resolve, reject) => {
+const updateData = async (id, data) => {
+  try{
+    await Person.update(data, {
+      where: {
+        id
+      }
+    });
+    return await Person.findByPk(id);
+  }catch(e){
+    logger.error(e);
+  }
+
+  /* const created = new Promise((resolve, reject) => {
     let query = "UPDATE people set";
     Object.entries(data).forEach((entry, idx, arr) => {
       const key = entry[0];
@@ -125,7 +160,7 @@ const updateData = async (mydb, id, data) => {
     });
     query = query.concat("where id = ?");
     logger.info(query);
-    mydb.run(query, id, async function(err) {
+    db.run(query, id, async function(err) {
       if (err) {
         logger.error(err);
         reject();
@@ -134,13 +169,18 @@ const updateData = async (mydb, id, data) => {
       resolve(updated);
     });
   });
-  return await created;
+  return await created;*/
 };
 
-const deleteData = async (mydb, id) => {
-  const created = new Promise((resolve, reject) => {
+const deleteData = async (id) => {
+  return await Person.destroy({
+    where: {
+      id
+    }
+  });
+  /*const created = new Promise((resolve, reject) => {
     const query = "delete from people where id = ?";
-    mydb.run(query, id, async function(err) {
+    db.run(query, id, async function(err) {
       if (err) {
         logger.error(err);
         reject();
@@ -148,8 +188,12 @@ const deleteData = async (mydb, id) => {
       resolve();
     });
   });
-  return await created;
+  return await created;*/
 };
+
+
+// run init db on startup
+initDBData();
 
 const DBOperations = {
   getAll,
@@ -157,9 +201,7 @@ const DBOperations = {
   updateData,
   createData,
   deleteData,
-  initDBData,
-  closeDB,
-  getDB,
+  initDBData
 };
 
 module.exports = DBOperations;
