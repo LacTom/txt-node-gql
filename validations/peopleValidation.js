@@ -1,7 +1,7 @@
 const Joi = require("joi");
 
 const params = Joi.object({
-  id: Joi.number().required(),
+  id: Joi.alternatives(Joi.number(), Joi.string()).required(),
 });
 const mandatoryValues = (enforceRequired = false) => {
   if (enforceRequired) {
