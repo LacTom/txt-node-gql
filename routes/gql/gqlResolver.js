@@ -1,3 +1,4 @@
+const { GraphQLError } = require("graphql");
 const DBOperations = require("../../mongoose/db");
 const logger = require("../../utils/logger");
 
@@ -8,16 +9,15 @@ const gqlResolver = {
         return await DBOperations.getAll();
       } catch (e) {
         logger.error(e);
-        throw new Error(e);
+        throw new GraphQLError(e);
       }
     },
     get: async (root, {id}) => {
       try {
-        console.log(id)
         return await DBOperations.get(id);
       } catch (e) {
         logger.error(e);
-        throw new Error(e);
+        throw new GraphQLError(e);
       }
     },
   },
@@ -27,7 +27,7 @@ const gqlResolver = {
         return await DBOperations.createData(data);
       } catch (e) {
         logger.error(e);
-        throw new Error(e);
+        throw new GraphQLError(e);
       }
     },
     update: async (root, { id, data }) => {
@@ -35,7 +35,7 @@ const gqlResolver = {
         return await DBOperations.updateData(id, data);
       } catch (e) {
         logger.error(e);
-        throw new Error(e);
+        throw new GraphQLError(e);
       }
     },
     delete: async (root, {id}) => {
@@ -44,7 +44,7 @@ const gqlResolver = {
         return deleted ? "OK" : "KO";
       } catch (e) {
         logger.error(e);
-        throw new Error(e);
+        throw new GraphQLError(e);
       }
     },
   },

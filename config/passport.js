@@ -2,13 +2,14 @@ const JwtStrategy = require('passport-jwt').Strategy;
 const { ExtractJwt } = require('passport-jwt');
 
 const logger = require("../utils/logger");
+const configs = require('./configs');
 
 const jwtFromRequest = (req) => {
   return ExtractJwt.fromAuthHeaderWithScheme('Bearer')(req);
 };
 
 const jwtOptions = {
-  secretOrKey: "123stella",
+  secretOrKey: configs.jwtSecret,
   jwtFromRequest,
 };
 
@@ -16,7 +17,7 @@ const jwt = async (payload, done) => {
   try {
     const user = {
       id: "1",
-      role: "admin",
+      role: configs.ADMIN,
     };
     return done(null, user);
   } catch (error) {

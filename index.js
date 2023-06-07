@@ -18,6 +18,9 @@ const {
 } = require("@apollo/server/plugin/drainHttpServer");
 const { ApolloServer } = require("@apollo/server");
 const { expressMiddleware } = require("@apollo/server/express4");
+const { authorize } = require('./middleware/auth.middleware');
+const { ADMIN } = require("./config/configs");
+const logPlugin = require("./routes/gql/gqlLogger");
 
 const app = express();
 const port = 3000;
@@ -26,17 +29,21 @@ const apolloServer = new ApolloServer({
   debug: true,
   typeDefs: gqlSchema,
   resolvers: gqlResolver,
-  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  plugins: [logPlugin, ApolloServerPluginDrainHttpServer({ httpServer })],
 });
 
 (async () => {
   await apolloServer.start();
   app.use(
     "/graphql",
+    authorize([ADMIN]),
     cors(),
     json(),
     expressMiddleware(apolloServer, {
-      context: async ({ req }) => ({ token: req.headers.token }),
+      context: async ({ req, res }) => {
+        const token = req.headers.authorization || '';
+        return { token, user: req.user };
+      },
     })
   );
   app.get("/", (req, res) => {
