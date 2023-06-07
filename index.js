@@ -21,6 +21,8 @@ const { expressMiddleware } = require("@apollo/server/express4");
 const { authorize } = require('./middleware/auth.middleware');
 const { ADMIN } = require("./config/configs");
 const logPlugin = require("./routes/gql/gqlLogger");
+const { getJwtPayload } = require("./config/jwt");
+const { GraphQLError } = require("graphql");
 
 const app = express();
 const port = 3000;
@@ -36,12 +38,18 @@ const apolloServer = new ApolloServer({
   await apolloServer.start();
   app.use(
     "/graphql",
-    authorize([ADMIN]),
     cors(),
     json(),
     expressMiddleware(apolloServer, {
       context: async ({ req, res }) => {
         const token = req.headers.authorization || '';
+        if(req?.body.operationName === "IntrospectionQuery") {
+          return {};
+        }
+        const user = getJwtPayload(token)
+        if(!user) {
+          throw new GraphQLError('must authenticate');
+        }
         return { token, user: req.user };
       },
     })
