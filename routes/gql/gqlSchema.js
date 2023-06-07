@@ -1,6 +1,7 @@
 const { buildSchema } = require("graphql");
 
 const gqlSchema = buildSchema(`
+#graphql
 enum BU {
     DIMI
     DINE
