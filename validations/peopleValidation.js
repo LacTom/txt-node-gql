@@ -1,10 +1,8 @@
 const Joi = require("joi");
 
-const params = {
-  id: Joi.string()
-    .regex(/^[0-9]{24}$/)
-    .required(),
-};
+const params = Joi.object({
+  id: Joi.number().required(),
+});
 const mandatoryValues = (enforceRequired = false) => {
   if (enforceRequired) {
     return {
@@ -27,17 +25,17 @@ const genericValues = {
 
 module.exports = {
   createPerson: {
-    body: {
+    body: Joi.object({
       ...mandatoryValues(true),
       ...genericValues,
-    },
+    }),
   },
 
   updatePerson: {
-    body: {
+    body: Joi.object({
       ...mandatoryValues(false),
       ...genericValues,
-    },
+    }),
     params,
   },
 

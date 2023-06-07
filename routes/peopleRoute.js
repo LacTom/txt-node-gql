@@ -1,7 +1,7 @@
 const express = require('express');
 const controller = require("../controllers/peopleController");
 const {createPerson, getPerson, updatePerson, deletePerson} = require("../validations/peopleValidation");
-
+const {validate} = require("express-validation");
 const router = express.Router();
 
 router.param('id', controller.load);
@@ -9,17 +9,17 @@ router.param('id', controller.load);
 router
   .route('/')
   // Create
-  .post(controller.create)
+  .post(validate(createPerson),controller.create)
   // Retrieve
   .get(controller.list)
 
   router
   .route('/:id')
   // Retrieve
-  .get(controller.get)
+  .get(validate(getPerson),controller.get)
   // Update
-  .patch(controller.update)
+  .patch(validate(updatePerson),controller.update)
   // Delete
-  .delete(controller.delete)
+  .delete(validate(deletePerson),controller.delete)
 
 module.exports = router;
