@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const expressValidation = require('express-validation');
 const APIError = require('../utils/APIError');
 
-const handler = (err, req, res, next) => {
+const handler = (err, req, res) => {
   const response = {
     code: err.status,
     message: err.message || httpStatus[err.status],
@@ -15,7 +15,7 @@ const handler = (err, req, res, next) => {
 };
 exports.handler = handler;
 
-exports.converter = (err, req, res, next) => {
+exports.converter = (err, req, res) => {
   let convertedError = err;
 
   if (err instanceof expressValidation.ValidationError) {
@@ -36,7 +36,7 @@ exports.converter = (err, req, res, next) => {
   return handler(convertedError, req, res);
 };
 
-exports.notFound = (req, res, next) => {
+exports.notFound = (req, res) => {
   const err = new APIError({
     message: 'Not found',
     status: httpStatus.NOT_FOUND,
