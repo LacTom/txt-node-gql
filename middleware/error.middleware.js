@@ -21,7 +21,7 @@ exports.converter = (err, req, res, next) => {
   if (err instanceof expressValidation.ValidationError) {
     convertedError = new APIError({
       message: 'Validation Error',
-      errors: err.errors,
+      errors: process.env.NODE_ENV === "production" ? err.errors : err.details.body,
       status: err.status,
       stack: err.stack,
     });
