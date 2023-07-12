@@ -5,8 +5,12 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "pm2-start": "pm2 start index.js --watch -f",
-    "pm2-stop": "pm2 delete all",
+    "pm2start": "pm2 start index.js --watch -f",
+    "pm2cluster": "pm2 start ecosystem.config.js",
+    "pm2stop": "pm2 delete all",
+    "pm2init": "pm2 init simple",
+    "pm2list": "pm2 list",
+    "pm2logs": "pm2 logs",
     "test": "test",
     "dev": "nodemon index.js",
     "swagger-autogen": "node swagger.js"
