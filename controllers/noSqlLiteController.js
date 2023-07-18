@@ -47,7 +47,6 @@ exports.update = async (req, res, next) => {
     const data = req.body;
     const id = req.params.id;
     const upd = await DBOperations.updateData(id, data)
-    console.log(upd)
     if(upd){
       res.status(httpStatus.OK);
       res.json(upd);

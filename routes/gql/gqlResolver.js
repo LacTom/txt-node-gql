@@ -4,7 +4,7 @@ const logger = require("../../utils/logger");
 
 const gqlResolver = {
   Query: {
-    list: async () => {
+    list: async (root) => {
       try {
         return await DBOperations.getAll();
       } catch (e) {

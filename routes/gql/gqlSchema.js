@@ -1,19 +1,29 @@
 const { buildSchema } = require("graphql");
 
 const gqlSchema = buildSchema(`
-#graphql
+# this is just a comment graphql
 enum BU {
+    #business unit
     DIMI
     DINE
     DINO
   }
+"""
+Person object
+"""
 type Person {
     _id: ID
     firstName: String
     lastName: String
+    """
+    Knowledge of Node
+    """
     knowsNodeJs: Boolean
     birthDate: String
     city: String
+    """
+    The Business unit this person belongs to
+    """
     BU: BU
 }
 input PersonInputCreate {

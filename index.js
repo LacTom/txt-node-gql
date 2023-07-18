@@ -18,8 +18,6 @@ const {
 } = require("@apollo/server/plugin/drainHttpServer");
 const { ApolloServer } = require("@apollo/server");
 const { expressMiddleware } = require("@apollo/server/express4");
-const { authorize } = require('./middleware/auth.middleware');
-const { ADMIN } = require("./config/configs");
 const logPlugin = require("./routes/gql/gqlLogger");
 const { getJwtPayload } = require("./config/jwt");
 const { GraphQLError } = require("graphql");

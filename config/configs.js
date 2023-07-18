@@ -1,4 +1,7 @@
+require('dotenv').config()
+
 module.exports = {
-    jwtSecret: "123stella",
+    MONGO_URL: process.env.MONGO_CONNECTION,
+    jwtSecret: process.env.JWT_SECRET,
     ADMIN: "admin"
 }

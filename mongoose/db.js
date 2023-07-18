@@ -2,7 +2,9 @@ const logger = require("../utils/logger");
 const mongoose = require("mongoose");
 const peopleMock = require("../mocks/peopleMock.json");
 const { BUs } = require("../config/techBUs");
-mongoose.connect("mongodb://127.0.0.1:27017/people");
+const { MONGO_URL } = require("../config/configs");
+
+mongoose.connect(MONGO_URL);
 
 const PersonSchema = mongoose.Schema({
   firstName: {
